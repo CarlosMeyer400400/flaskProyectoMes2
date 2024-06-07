@@ -9,7 +9,6 @@ app = Flask(__name__)
 # Configurar el registro
 logging.basicConfig(level=logging.DEBUG)
 
-# Cargar el modelo entrenado
 model = joblib.load('model.pkl')
 app.logger.debug('Modelo cargado correctamente.')
 
