@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Clasificador de Insectos</title>
+    <title>Clasificador de Setas</title>
     <script>
-        function clasificarInsecto(event) {
+        function clasificarSetas(event) {
             event.preventDefault();
-            const abdomen = document.getElementById('abdomen').value;
-            const antena = document.getElementById('antena').value;
+            const cap_diameter = document.getElementById('cap_diameter').value;
+            const cap_shape = document.getElementById('cap_shape').value;
+            const gill_attachment = document.getElementById('gill_attachment').value;
+            const stem_height = document.getElementById('stem_height').value;
+            const stem_width = document.getElementById('stem_width').value;
+            const stem_color = document.getElementById('stem_color').value;
+            const season = document.getElementById('season').value;
 
             fetch('/predict', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `abdomen=${abdomen}&antena=${antena}`,
+                body: `cap_diameter=${cap_diameter}&cap_shape=${cap_shape}&gill_attachment=${gill_attachment}&stem_height=${stem_height}&stem_width=${stem_width}&stem_color=${stem_color}&season=${season}`,
             })
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     document.getElementById('resultado').innerText = 'Error: ' + data.error;
                 } else {
-                    document.getElementById('resultado').innerText = 'El insecto es una ' + data.categoria;
+                    document.getElementById('resultado').innerText = 'La seta es ' + data.class;
                 }
             })
             .catch(error => {
@@ -31,12 +36,29 @@
     </script>
 </head>
 <body>
-    <h1>Clasificador de Insectos</h1>
-    <form id="formulario" onsubmit="clasificarInsecto(event)">
-        <label for="abdomen">Longitud del Abdomen:</label>
-        <input type="text" id="abdomen" name="abdomen"><br><br>
-        <label for="antena">Longitud de las Antenas:</label>
-        <input type="text" id="antena" name="antena"><br><br>
+    <h1>Clasificador de Setas:</h1>
+    <form id="formulario" onsubmit="clasificarSetas(event)">
+        <label for="cap_diameter">Diámetro del Sombrero:</label>
+        <input type="text" id="cap_diameter" name="cap_diameter"><br><br>
+
+        <label for="cap_shape">Forma del Sombrero:</label>
+        <input type="text" id="cap_shape" name="cap_shape"><br><br>
+
+        <label for="gill_attachment">Unión de las Láminas:</label>
+        <input type="text" id="gill_attachment" name="gill_attachment"><br><br>
+       
+        <label for="stem_height">Altura del Tallo:</label>
+        <input type="text" id="stem_height" name="stem_height"><br><br>
+
+        <label for="stem_width">Ancho del Tallo:</label>
+        <input type="text" id="stem_width" name="stem_width"><br><br>
+
+        <label for="stem_color">Color del Tallo:</label>
+        <input type="text" id="stem_color" name="stem_color"><br><br>
+        
+        <label for="season">Temporada:</label>
+        <input type="text" id="season" name="season"><br><br>
+
         <input type="submit" value="Enviar">
     </form>
     <p id="resultado"></p>
