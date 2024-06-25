@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template
 import pandas as pd
 import logging
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+import numpy as np
 
 app = Flask(__name__)
 
@@ -10,69 +11,49 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 # Ruta completa del archivo CSV
-csv_path = 'mushroom_cleaned.csv'
+csv_path = 'possum.csv'
 
 # Intentar cargar datos desde el CSV
 try:
     data = pd.read_csv(csv_path)
     app.logger.debug('Datos cargados correctamente.')
+
+    # Eliminar filas con valores NaN en la columna 'age'
+    data = data.dropna(subset=['age'])
+    app.logger.debug('Datos limpios, NaN eliminados.')
+
 except FileNotFoundError as e:
     app.logger.error(f'Error al cargar los datos: {str(e)}')
     data = None
 
-# Verifica que los datos fueron cargados correctamente
-if data is not None:
-    # Asegúrate de eliminar la columna `gill-color` si existe
-    if 'gill-color' in data.columns:
-        data = data.drop('gill-color', axis=1)
-    
-    # Separar las características y la etiqueta
-    X = data.drop('class', axis=1)
-    y = data['class']
-    
-    # Dividir los datos en conjuntos de entrenamiento y prueba
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Entrenar el modelo
-    model = RandomForestClassifier()
-    model.fit(X_train, y_train)
-    app.logger.debug('Modelo entrenado correctamente.')
-else:
-    model = None
+# Ruta de la página principal
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        # Obtener los datos del formulario y convertir a float
+        site = float(request.form['site'])
+        hdlngth = float(request.form['hdlngth'])
+        skullw = float(request.form['skullw'])
+        totlngth = float(request.form['totlngth'])
+        footlgth = float(request.form['footlgth'])
+        chest = float(request.form['chest'])
 
-@app.route('/')
-def home():
-    return render_template('formulario.html')
+        # Realizar la predicción utilizando un modelo (Random Forest Regressor)
+        X = data[['site', 'hdlngth', 'skullw', 'totlngth', 'footlgth', 'chest']]
+        y = data['age']
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    if model is None:
-        return jsonify({'error': 'Modelo no disponible'}), 500
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    try:
-        # Obtener los datos enviados en el request
-        cap_diameter = int(request.form['cap_diameter'])
-        cap_shape = int(request.form['cap_shape'])
-        gill_attachment = int(request.form['gill_attachment'])
-        stem_height = float(request.form['stem_height'])
-        stem_width = int(request.form['stem_width'])
-        stem_color = int(request.form['stem_color'])
-        season = float(request.form['season'])
-        
-        # Crear un DataFrame con los datos
-        data_df = pd.DataFrame([[cap_diameter, cap_shape, gill_attachment, stem_height, stem_width, stem_color, season]],
-                               columns=['cap-diameter', 'cap-shape', 'gill-attachment',  'stem-height', 'stem-width', 'stem-color', 'season'])
-        app.logger.debug(f'DataFrame creado: {data_df}')
-        
-        # Realizar predicciones
-        prediction = model.predict(data_df)
-        app.logger.debug(f'Predicción: {prediction[0]}')
-        
-        # Devolver las predicciones como respuesta JSON
-        return jsonify({'class': "Comestible" if prediction[0] == 1 else "Venenoso"})
-    except Exception as e:
-        app.logger.error(f'Error en la predicción: {str(e)}')
-        return jsonify({'error': str(e)}), 400
+        model = RandomForestRegressor()
+        model.fit(X_train, y_train)
+
+        # Predecir utilizando los datos del formulario
+        input_data = np.array([[site, hdlngth, skullw, totlngth, footlgth, chest]])
+        predicted_age = int(round(model.predict(input_data)[0]))
+
+        return render_template('index.html', prediction=predicted_age)
+    else:
+        return render_template('index.html', prediction=None)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de Regresión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f0f0f0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+h2 {
+    color: #4CAF50;
+}
+
+form {
+    margin-top: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 5px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.prediction {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CARLOS EZEQUIEL MEYER MEDINA 20210696</h1>
+        <h2>9B INGENIERIA EN DESARROLLO Y GESTION DE SOFTWARE</h2>
+        <h1>Modelo de Regresión</h1>
+        <form action="/" method="post">
+            <label for="site">Site (1 a 7):</label>
+            <input type="number" id="site" name="site" required min="1" max="7"><br><br>
+            <label for="hdlngth">Hdlngth (80 a 103):</label>
+            <input type="number" id="hdlngth" name="hdlngth" required min="80" max="103"><br><br>
+            <label for="skullw">Skullw (50 a 68.6):</label>
+            <input type="number" id="skullw" name="skullw" required min="50" max="68.6"><br><br>
+            <label for="totlngth">Totlngth (75 a 96.5):</label>
+            <input type="number" id="totlngth" name="totlngth" required min="75" max="96.5"><br><br>
+            <label for="footlgth">Footlgth (32 a 43):</label>
+            <input type="number" id="footlgth" name="footlgth" required min="32" max="43"><br><br>
+            <label for="chest">Chest (20 a 40):</label>
+            <input type="number" id="chest" name="chest" required min="20" max="40"><br><br>
+            <button type="submit">Predecir</button>
+        </form>
+
+        {% if prediction is not none %}
+        <div class="prediction">
+            <h2>Predicción de Edad: {{ prediction }}</h2>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
